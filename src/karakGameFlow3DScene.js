@@ -64,7 +64,7 @@ class KarakGameFlow {
     // Pridanie detekcie kliknutia
   }
 
-  getRandomCharacters(characterProperties, count = 5) {
+  getRandomCharacters(characterProperties, count) {
     const keys = Object.keys(characterProperties);
     const selectedKeys = [];
 
@@ -81,7 +81,7 @@ class KarakGameFlow {
 
   initializeCharacters(playerNames) {
     // Náhodný výber 5 charakterov
-    const selectedCharacters = this.getRandomCharacters(characterProperties);
+    const selectedCharacters = this.getRandomCharacters(characterProperties, playerNames.length);
 
     // Spojenie mien hráčov s náhodne vybranými charakterami
     const sampleCharacters = playerNames.map((name, index) => {
