@@ -90,11 +90,11 @@ class KarakGameFlow {
 
     // Vaša existujúca logika pre pridanie hráčov a charakterov
     const offsets = [
-        { x: -0.3, y: 0.3 },
-        { x: 0.3, y: -0.3 },
-        { x: 0.3, y: 0.3 },
-        { x: -0.3, y: -0.3 },
-        { x: 0.3, y: 0.1 }
+        { x: -0.2, y: 0.2 },
+        { x: 0.2, y: -0.2 },
+        { x: 0.2, y: 0.2 },
+        { x: -0.2, y: -0.2 },
+        { x: 0.2, y: 0 }
     ];
 
     sampleCharacters.forEach((character, index) => {
