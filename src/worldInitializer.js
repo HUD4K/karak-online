@@ -34,8 +34,10 @@ class WorldInitializer {
   
     _initializeCamera() {
       const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 10, 0);
+
+      camera.position.set(0, 10, 5);
       camera.lookAt(new THREE.Vector3(0, 0, 0));
+
       return camera;
     }
   
@@ -47,7 +49,6 @@ class WorldInitializer {
   
     _initializeControls() {
       const controls = new OrbitControls(this._camera, this._threejs.domElement);
-      //controls.enableDamping = true; // Voliteľné, pre plynulejšie ovládanie
       //controls.enableZoom = false;
       //controls.enableRotate = false;
       return controls;
@@ -68,11 +69,12 @@ class WorldInitializer {
       }
     
     _RAF() {
-    requestAnimationFrame(() => {
-        this._threejs.render(this._scene, this._camera);
-        this._RAF();
-    });
+      requestAnimationFrame(() => {
+          this._threejs.render(this._scene, this._camera);
+          this._RAF();
+      });
     }
+    
   
     getWorldComponents() {
       return {

@@ -50,7 +50,7 @@ class KarakGameFlow {
     // Načítať model karty iba raz
     this._LoadCardModelOnce().then(model => {
       this.cardModel = model; // Uložiť model pre neskoršie použitie
-      this._AddInitialCard();  // Teraz pridáme úvodnú kartu
+      this._AddInitialCard();  
     });
     
     this.buttonsManager = new ButtonsManager(this);
@@ -61,7 +61,6 @@ class KarakGameFlow {
   _Initialize() {
     this._LoadModel();
     this._createGrid();
-    // Pridanie detekcie kliknutia
   }
 
   getRandomCharacters(characterProperties, count) {
@@ -80,7 +79,7 @@ class KarakGameFlow {
   }
 
   initializeCharacters(playerNames) {
-    // Náhodný výber 5 charakterov
+    // Náhodný výber n charakterov
     const selectedCharacters = this.getRandomCharacters(characterProperties, playerNames.length);
 
     // Spojenie mien hráčov s náhodne vybranými charakterami
@@ -321,11 +320,18 @@ class KarakGameFlow {
   //funkcia na prechod na dalsieho hraca (kto je na rade):
   _changePlayer() {
     // Prechod na ďalšieho hráča a reset pohybov
-    this.currentPlayerId = (this.currentPlayerId % 5) + 1;
+    this.currentPlayerId = (this.currentPlayerId % this.players.length) + 1;
     const currentPlayer = this._findPlayerById(this.currentPlayerId);
-    currentPlayer.userData.moves = 4; // Resetovanie pohybov na 4
-    this._infoBoxManager.updateGameInfo(this.players, this.currentPlayerId, this.currentSquare, this.totalCardsPlaced, this.totalRedCardsPlaced);
-  }
+
+    // Skontrolujte, či currentPlayer naozaj existuje
+    if (currentPlayer) {
+        currentPlayer.userData.moves = 4; // Resetovanie pohybov na 4
+        this._infoBoxManager.updateGameInfo(this.players, this.currentPlayerId, this.currentSquare, this.totalCardsPlaced, this.totalRedCardsPlaced);
+    } else {
+        console.error('Error: player with ID ' + this.currentPlayerId + ' does not exist.');
+    }
+}
+
   
 
 
@@ -397,17 +403,17 @@ class KarakGameFlow {
     this._scene.add(card);
   
     // Animácia karty z výšky na konečnú pozíciu
-    await this._animateCardToPosition(card, 0.5, 400);
+    await this._animateCardToPosition(card, 0.5, 600);
   
     // Nastavenie smeru karty a zobrazenie tlačidiel
     this._setCardDirections(intersectedObject, selectedTexture);
     this.buttonsManager.showButtons(this._lastMouseX, this._lastMouseY);
   
-    this._shakeScreen(50);
+    this._shakeScreen(200);
   
     // Odloženie zatrasenia a pohybu hráča
     this.buttonsManager.setOkButtonOnClick(() => {
-      setTimeout(() => this._shakeScreen(200), 170);
+      setTimeout(() => this._shakeScreen(350), 170);
       setTimeout(() => this._MovePlayerToPosition(this.currentPlayerId, intersectedObject.userData.suradnicaI, intersectedObject.userData.suradnicaJ), 50);
       this.buttonsManager.clearOkButtonOnClick(); // Odstránenie listenera po použití
     });
@@ -500,8 +506,8 @@ class KarakGameFlow {
       const relativeTime = elapsedTime / duration;
   
       if (relativeTime < 1) {
-        const x = (Math.random() - 0.5) * 5;
-        const y = (Math.random() - 0.5) * 5;
+        const x = (Math.random() - 0.5) * 12;
+        const y = (Math.random() - 0.5) * 12;
         body.style.transform = `translate(${x}px, ${y}px)`;
   
         requestAnimationFrame(shake);
