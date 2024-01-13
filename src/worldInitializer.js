@@ -1,5 +1,6 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/loaders/GLTFLoader.js';
 
 class WorldInitializer {
     constructor() {
@@ -83,6 +84,16 @@ class WorldInitializer {
         scene: this._scene,
         controls: this._controls
       };
+    }
+
+    //game board model:
+    LoadModel() {
+      const loader = new GLTFLoader();
+      loader.load('../models3d/table.glb', (gltf) => {
+
+        gltf.scene.position.set(5, -0.12, 5);
+        this._scene.add(gltf.scene);
+      });
     }
   }
 

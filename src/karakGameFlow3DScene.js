@@ -9,20 +9,21 @@ import StartScreen from './StartScreen.js';
 import { characterProperties } from './characterProperties.js';
 
 
-//Hlavna trieda
+// Main class
 class KarakGameFlow {
-  //Konstruktor
   constructor() {
 
     const startScreen = new StartScreen(playerNames => {
       this.initializeCharacters(playerNames);
-      // detekciu kliknutia som pridal až teraz, inak to dávalo e
+
+      // Add event listener for mouse click after the start screen is closed
       window.addEventListener('click', (event) => this._onMouseClick(event), false);
     });
 
     this._worldInitializer = new WorldInitializer();
     const { renderer, camera, scene, controls } = this._worldInitializer.getWorldComponents();
 
+    // initialized world components
     this._threejs = renderer;
     this._camera = camera;
     this._scene = scene;
@@ -30,10 +31,6 @@ class KarakGameFlow {
 
     this._raycaster = this._worldInitializer.getRaycaster();
     this._mouse = this._worldInitializer.getMouseVector();
-
-    this.X = 0;
-    this.Y = 10;
-    this.Z = 0;
 
     this._infoBoxManager = new InfoBoxManager();
     this._sidebarManager = new SidebarManager();
@@ -44,12 +41,15 @@ class KarakGameFlow {
     this.isCardBeingPlaced = false;
     this.isRotating = false;
 
-    this.currentPlayerId = 1; // na začiatku je na rade hráč s ID 1
-    this.players = []; // zoznam všetkých hráčov
+    // At the beginning, player with ID 1 is on turn
+    this.currentPlayerId = 1; 
 
-    // Načítať model karty iba raz
+    // List of all players
+    this.players = []; 
+
     this._LoadCardModelOnce().then(model => {
-      this.cardModel = model; // Uložiť model pre neskoršie použitie
+      // Save the model for later use
+      this.cardModel = model; 
       this._AddInitialCard();  
     });
     
@@ -59,7 +59,7 @@ class KarakGameFlow {
   }
 
   _Initialize() {
-    this._LoadModel();
+    this._worldInitializer.LoadModel();
     this._createGrid();
   }
 
@@ -79,15 +79,15 @@ class KarakGameFlow {
   }
 
   initializeCharacters(playerNames) {
-    // Náhodný výber n charakterov
+    // Random selection of n characters
     const selectedCharacters = this.getRandomCharacters(characterProperties, playerNames.length);
 
-    // Spojenie mien hráčov s náhodne vybranými charakterami
+    // Combine player names with randomly selected characters
     const sampleCharacters = playerNames.map((name, index) => {
         return { playerName: name, characterName: selectedCharacters[index].characterName };
     });
 
-    // Vaša existujúca logika pre pridanie hráčov a charakterov
+    // setting up character offsets from the center of the card
     const offsets = [
         { x: -0.2, y: 0.2 },
         { x: 0.2, y: -0.2 },
@@ -95,14 +95,12 @@ class KarakGameFlow {
         { x: -0.2, y: -0.2 },
         { x: 0.2, y: 0 }
     ];
-
     sampleCharacters.forEach((character, index) => {
         this._AddPlayer(character.characterName, index + 1, offsets[index]);
     });
+
     this._sidebarManager.createMultipleCharacterCards(sampleCharacters);
   }
-
-
 
 
   //funkcia na vytvorenie hraca:
@@ -139,15 +137,7 @@ class KarakGameFlow {
     });
   }
 
-  //funkcia na nacitanie modelu hracej plochy:
-  _LoadModel() {
-    const loader = new GLTFLoader();
-    loader.load('../models3d/dosticka.glb', (gltf) => {
 
-      gltf.scene.position.set(5, -0.12, 5);
-      this._scene.add(gltf.scene);
-    });
-  }
 
   //funkcia na vytvorenie základnej mriežky:
   _createGrid() {
@@ -193,8 +183,6 @@ class KarakGameFlow {
 
   //funkcia na pridanie prvej karty:
   _AddInitialCard() {
-    // Uistite sa, že model karty je už načítaný
-
   
     const card = this.cardModel.clone(); // Sklonovať model karty
   
@@ -214,7 +202,7 @@ class KarakGameFlow {
     
     this._infoBoxManager.updateGameInfo(this.players, this.currentPlayerId, this.currentSquare, this.totalCardsPlaced, this.totalRedCardsPlaced);
   
-    // Nájdenie a aktualizácia bunky, na ktorej je umiestnená iniciálna karta
+    // setting up the initial card cell
     const initialSquare = this._scene.children.find(obj => obj.userData && obj.userData.suradnicaI === initX && obj.userData.suradnicaJ === initZ);
     if (initialSquare) {
       initialSquare.userData.isCard = true;
