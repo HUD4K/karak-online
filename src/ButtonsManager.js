@@ -1,11 +1,11 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js'; // Ak používate THREE v ButtonsManager
-import KarakGameFlow from './karakGameFlow3DScene.js';
 
 class ButtonsManager {
-    constructor(gameFlowContext) {
+    constructor(gameFlowContext, state) {
       this.gameFlowContext = gameFlowContext; // Uloženie referencie na hlavnú triedu hry
       this._rotateButton = null;
       this._okButton = null;
+
+      this.state = state;
   
       this.initializeButtons();
     }
@@ -92,7 +92,7 @@ class ButtonsManager {
       if (this._okButton) {
         this._okButton.style.display = 'none';
       }
-      this.gameFlowContext.isCardBeingPlaced = false;
+      this.state.isCardBeingPlaced = false;
     }
   
     hideButtonsAndReset() {
