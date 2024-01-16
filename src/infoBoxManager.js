@@ -19,7 +19,7 @@ export class InfoBoxManager {
   
       // Informácie o hráčoch
       players.forEach(player => {
-        infoText += `Player ${player.userData.id}: ${player.userData.suradnicaI}, ${player.userData.suradnicaJ}, Moves: ${player.userData.moves}<br>`;
+        infoText += `Player ${player.userData.id}: ${player.userData.dimensionI}, ${player.userData.dimensionJ}, Moves: ${player.userData.moves}<br>`;
       });
   
       // Informácie o tom, ktorý hráč je na rade

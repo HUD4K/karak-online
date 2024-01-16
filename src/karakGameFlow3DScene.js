@@ -10,7 +10,6 @@ import { characterProperties } from './characterProperties.js';
 import { TilesFunctions } from './TilesFunctions.js';
 
 
-// Main class
 class KarakGameFlow {
   constructor() {
 
@@ -38,7 +37,7 @@ class KarakGameFlow {
       isRotating: false,
       currentPlayerId: 1,
       players: [],
-      cardModel: null,
+      cardModel: null, // !
       infoBoxManager : new InfoBoxManager(),
       sidebarManager : new SidebarManager(),
       scene : scene
@@ -47,7 +46,7 @@ class KarakGameFlow {
     this.tilesFunctions = new TilesFunctions(this.state);
 
     this.tilesFunctions._LoadCardModelOnce().then(model => {
-      // Uloženie modelu a aktualizácia stavu
+      // save model and update state
       this.state.cardModel = model;
       this.tilesFunctions._AddInitialCard();  
     });
@@ -112,8 +111,8 @@ class KarakGameFlow {
     player.position.set(worldX, 0, worldZ);
 
     player.userData = {
-        suradnicaI: defaultCoord,
-        suradnicaJ: defaultCoord,
+        dimensionI: defaultCoord,
+        dimensionJ: defaultCoord,
         id: id,
         offsetX: offset.x,
         offsetY: offset.y,
@@ -144,8 +143,8 @@ class KarakGameFlow {
 
             // Priradenie vlastností bunky
             square.userData = {
-                suradnicaI: i,
-                suradnicaJ: j,
+                dimensionI: i,
+                dimensionJ: j,
                 isCard: false,
                 headingWest: false,
                 headingNorth: false,
@@ -199,7 +198,7 @@ class KarakGameFlow {
     const player = this._findPlayerById(playerId);
     if (player) {
       // Skontrolovať, či je nová pozícia rovnaká ako súčasná
-      if (player.userData.suradnicaI === newI && player.userData.suradnicaJ === newJ) {
+      if (player.userData.dimensionI === newI && player.userData.dimensionJ === newJ) {
           // Hráč už stojí na tejto kartičke, nevykonávať žiadne zmeny
           return;
       }
@@ -212,8 +211,8 @@ class KarakGameFlow {
       await this._animatePlayerToPosition(player, newWorldX, newWorldZ);
   
       // Aktualizácia súradníc hráča po dokončení animácie
-      player.userData.suradnicaI = newI;
-      player.userData.suradnicaJ = newJ;
+      player.userData.dimensionI = newI;
+      player.userData.dimensionJ = newJ;
       player.userData.moves--;
   
       // Skontrolovať, či hráč vyčerpal všetky pohyby
@@ -339,7 +338,7 @@ class KarakGameFlow {
     this.state.scene.add(card);
   
     // Animácia karty z výšky na konečnú pozíciu
-    await this._animateCardToPosition(card, 0.5, 600);
+    await this.tilesFunctions._animateCardToPosition(card, 0.5, 600);
   
     // Nastavenie smeru karty a zobrazenie tlačidiel
     this._setCardDirections(intersectedObject, selectedTexture);
@@ -350,7 +349,7 @@ class KarakGameFlow {
     // Odloženie zatrasenia a pohybu hráča
     this.buttonsManager.setOkButtonOnClick(() => {
       setTimeout(() => this._shakeScreen(350), 170);
-      setTimeout(() => this._MovePlayerToPosition(this.state.currentPlayerId, intersectedObject.userData.suradnicaI, intersectedObject.userData.suradnicaJ), 50);
+      setTimeout(() => this._MovePlayerToPosition(this.state.currentPlayerId, intersectedObject.userData.dimensionI, intersectedObject.userData.dimensionJ), 50);
       this.buttonsManager.clearOkButtonOnClick(); // Odstránenie listenera po použití
     });
   
@@ -374,14 +373,14 @@ class KarakGameFlow {
   
     if (intersects.length > 0) {
       const intersectedObject = intersects[0].object;
-      if (intersectedObject.userData.suradnicaI !== undefined) {
+      if (intersectedObject.userData.dimensionI !== undefined) {
         // Získanie aktuálnej pozície hráča a bunky
         const currentPlayer = this._findPlayerById(this.state.currentPlayerId);
-        const currentPlayerSquare = this.state.scene.children.find(obj => obj.userData && obj.userData.suradnicaI === currentPlayer.userData.suradnicaI && obj.userData.suradnicaJ === currentPlayer.userData.suradnicaJ);
+        const currentPlayerSquare = this.state.scene.children.find(obj => obj.userData && obj.userData.dimensionI === currentPlayer.userData.dimensionI && obj.userData.dimensionJ === currentPlayer.userData.dimensionJ);
     
         // Zistiť smer medzi aktuálnou a kliknutou bunkou
-        const diffI = intersectedObject.userData.suradnicaI - currentPlayerSquare.userData.suradnicaI;
-        const diffJ = intersectedObject.userData.suradnicaJ - currentPlayerSquare.userData.suradnicaJ;
+        const diffI = intersectedObject.userData.dimensionI - currentPlayerSquare.userData.dimensionI;
+        const diffJ = intersectedObject.userData.dimensionJ - currentPlayerSquare.userData.dimensionJ;
         
         console.log('diffI:', diffI, ' diffJ:', diffJ, ' playerEast:', currentPlayerSquare.userData.headingEast, ' playerWest:', currentPlayerSquare.userData.headingWest, ' playerNorth:', currentPlayerSquare.userData.headingNorth, ' playerSouth:', currentPlayerSquare.userData.headingSouth, ' cardEast:', intersectedObject.userData.headingEast, ' cardWest:', intersectedObject.userData.headingWest, ' cardNorth:', intersectedObject.userData.headingNorth, ' cardSouth:', intersectedObject.userData.headingSouth, ' isCard:', intersectedObject.userData.isCard, ' isRoom:', intersectedObject.userData.isRoom, ' isArena:', intersectedObject.userData.isArena, ' isChamber:', intersectedObject.userData.isChamber, ' isTeleport:', intersectedObject.userData.isTeleport, ' isHealingWell:', intersectedObject.userData.isHealingWell, ' monsterId:', intersectedObject.userData.monsterId, ' itemId:', intersectedObject.userData.itemId, ' isCompatible:', this.buttonsManager.isOkButtonDisabled());
 
@@ -401,36 +400,14 @@ class KarakGameFlow {
             this._addNewCard(intersectedObject);
           } else {
             // Presun hráča, ktorý je na rade, na existujúcu kartu
-            this._MovePlayerToPosition(this.state.currentPlayerId, intersectedObject.userData.suradnicaI, intersectedObject.userData.suradnicaJ);
+            this._MovePlayerToPosition(this.state.currentPlayerId, intersectedObject.userData.dimensionI, intersectedObject.userData.dimensionJ);
           }
         }
       }
     }    
   }
 
-  //funkcia na animaciu karty:
-  _animateCardToPosition(card, targetY, duration) {
-    return new Promise((resolve) => {
-      const startY = card.position.y;
-      const endY = targetY;
-  
-      const startTime = performance.now();
-      const animate = () => {
-        const currentTime = performance.now();
-        const progress = Math.min((currentTime - startTime) / duration, 1);
-  
-        card.position.y = startY + (endY - startY) * progress;
-  
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          resolve();
-        }
-      };
-  
-      animate();
-    });
-  }
+
   
   _shakeScreen(duration) {
     const body = document.body;
@@ -502,19 +479,14 @@ class KarakGameFlow {
 
   _checkCardCompatibility() {
     const currentPlayer = this._findPlayerById(this.state.currentPlayerId);
-    const currentPlayerSquare = this.state.scene.children.find(obj => obj.userData && obj.userData.suradnicaI === currentPlayer.userData.suradnicaI && obj.userData.suradnicaJ === currentPlayer.userData.suradnicaJ);
+    const currentPlayerSquare = this.state.scene.children.find(obj => obj.userData && obj.userData.dimensionI === currentPlayer.userData.dimensionI && obj.userData.dimensionJ === currentPlayer.userData.dimensionJ);
   
     const newCardSquare = this.currentSquare;
-  
-    console.log('Smerovanie karty, na ktorej stojí hráč:', currentPlayerSquare.userData);
-    console.log('Smerovanie novej karty:', newCardSquare.userData);
 
     let isCompatible = false;
 
-
-    const deltaI = newCardSquare.userData.suradnicaI - currentPlayerSquare.userData.suradnicaI;
-    const deltaJ = newCardSquare.userData.suradnicaJ - currentPlayerSquare.userData.suradnicaJ;
-    
+    const deltaI = newCardSquare.userData.dimensionI - currentPlayerSquare.userData.dimensionI;
+    const deltaJ = newCardSquare.userData.dimensionJ - currentPlayerSquare.userData.dimensionJ;    
   
     if (deltaI === 1 && currentPlayerSquare.userData.headingEast && newCardSquare.userData.headingWest) {
       isCompatible = true;
@@ -525,9 +497,6 @@ class KarakGameFlow {
     } else if (deltaJ === -1 && currentPlayerSquare.userData.headingNorth && newCardSquare.userData.headingSouth) {
       isCompatible = true;
     }
-    
-
-    console.log('Kompatibilita:', isCompatible, ' DI: ', deltaI, ' DJ: ', deltaJ);
 
     if (isCompatible) {
       this.buttonsManager.enableOkButton();

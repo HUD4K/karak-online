@@ -39,7 +39,7 @@ export class TilesFunctions {
         this.state.infoBoxManager.updateGameInfo(this.state.players, this.state.currentPlayerId, this.state.currentSquare, this.state.totalCardsPlaced, this.state.totalRedCardsPlaced);
     
         // setting up the initial card cell
-        const initialSquare = this.state.scene.children.find(obj => obj.userData && obj.userData.suradnicaI === initX && obj.userData.suradnicaJ === initZ);
+        const initialSquare = this.state.scene.children.find(obj => obj.userData && obj.userData.dimensionI === initX && obj.userData.dimensionJ === initZ);
         if (initialSquare) {
         initialSquare.userData.isCard = true;
         initialSquare.userData.headingWest = true;
@@ -48,6 +48,31 @@ export class TilesFunctions {
         initialSquare.userData.headingSouth = true;
         initialSquare.userData.isHealingWell = true;
         }
+    }
+
+
+      //funkcia na animaciu karty:
+    _animateCardToPosition(card, targetY, duration) {
+      return new Promise((resolve) => {
+        const startY = card.position.y;
+        const endY = targetY;
+    
+        const startTime = performance.now();
+        const animate = () => {
+          const currentTime = performance.now();
+          const progress = Math.min((currentTime - startTime) / duration, 1);
+    
+          card.position.y = startY + (endY - startY) * progress;
+    
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            resolve();
+          }
+        };
+    
+        animate();
+      });
     }
 
 }
