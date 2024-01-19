@@ -12,6 +12,7 @@ import { TilesFunctions } from './TilesFunctions.js';
 
 class KarakGameFlow {
   constructor() {
+    
 
     const startScreen = new StartScreen(playerNames => {
       this.initializeCharacters(playerNames);
@@ -299,6 +300,9 @@ class KarakGameFlow {
       if (intersectedObject.userData.dimensionI !== undefined) {
         // Get current player and current player square
         const currentPlayer = this._findPlayerById(this.state.currentPlayerId);
+
+        //console.log(currentPlayer.userData.name);
+
         const currentPlayerSquare = this.state.scene.children.find(obj => obj.userData && obj.userData.dimensionI === currentPlayer.userData.dimensionI && obj.userData.dimensionJ === currentPlayer.userData.dimensionJ);
     
         // Check if the clicked square is adjacent to the current player square
