@@ -1,7 +1,7 @@
 
 class ButtonsManager {
     constructor(gameFlowContext, state) {
-      this.gameFlowContext = gameFlowContext; // Uloženie referencie na hlavnú triedu hry
+      this.gameFlowContext = gameFlowContext; // Save reference to main class of game
       this._rotateButton = null;
       this._okButton = null;
 
@@ -11,7 +11,7 @@ class ButtonsManager {
     }
   
     initializeButtons() {
-      // Vytvorenie a nastavenie tlačidla na otáčanie
+      // rotate button
       this._rotateButton = document.createElement('button');
       this._rotateButton.style.position = 'absolute';
       this._rotateButton.style.width = '40px'; 
@@ -19,11 +19,11 @@ class ButtonsManager {
       this._rotateButton.style.backgroundImage = 'url("../textures/buttons/rotateButton.jpg")';
       this._rotateButton.style.backgroundSize = 'cover';
       this._rotateButton.style.borderRadius = '50%';
-      this._rotateButton.style.display = 'none'; // Predvolené skrytie
+      this._rotateButton.style.display = 'none'; // Preset to hide
       this._rotateButton.style.filter = 'brightness(1)';
       document.body.appendChild(this._rotateButton);
     
-      // Vytvorenie a nastavenie tlačidla OK
+      // OK button
       this._okButton = document.createElement('button');
       this._okButton.style.position = 'absolute';
       this._okButton.style.width = '40px';
@@ -31,49 +31,48 @@ class ButtonsManager {
       this._okButton.style.backgroundImage = 'url("../textures/buttons/placeButton.jpg")';
       this._okButton.style.backgroundSize = 'cover';
       this._okButton.style.borderRadius = '50%';
-      this._okButton.style.display = 'none'; // Predvolené skrytie
+      this._okButton.style.display = 'none';
       this._okButton.style.filter = 'brightness(1)';
       document.body.appendChild(this._okButton);
   
   
       this._rotateButton.addEventListener('mouseover', () => {
         if (!this._rotateButton.disabled) {
-          this._rotateButton.style.filter = 'brightness(1.2)'; // Zosvetlenie iba ak nie je disabled
+          this._rotateButton.style.filter = 'brightness(1.2)';
         }
       });
       
       this._rotateButton.addEventListener('mouseout', () => {
         if (!this._rotateButton.disabled) {
-          this._rotateButton.style.filter = 'brightness(1)'; // Vrátenie do pôvodného stavu
+          this._rotateButton.style.filter = 'brightness(1)';
         }
       });
       
       this._okButton.addEventListener('mouseover', () => {
         if (!this._okButton.disabled) {
-          this._okButton.style.filter = 'brightness(1.2)'; // Zosvetlenie iba ak nie je disabled
+          this._okButton.style.filter = 'brightness(1.2)';
         }
       });
       
       this._okButton.addEventListener('mouseout', () => {
         if (!this._okButton.disabled) {
-          this._okButton.style.filter = 'brightness(1)'; // Vrátenie do pôvodného stavu
+          this._okButton.style.filter = 'brightness(1)';
         }
       });
     }
     
     setupButtonEventListeners() {
       this._rotateButton.addEventListener('click', (event) => {
-        event.stopPropagation(); // Zabránenie šíreniu udalosti
+        event.stopPropagation();
         this.gameFlowContext._rotateCurrentCard();
       });
   
       this._okButton.addEventListener('click', (event) => {
-        event.stopPropagation(); // Zabránenie šíreniu udalosti
+        event.stopPropagation();
         this.hideButtonsAndReset();
       });
     }
   
-    //funkcia na zobrazenie tlačidiel:
     showButtons(x, y) {
       this._rotateButton.style.left = `${x}px`;
       this._rotateButton.style.top = `${y}px`;
@@ -85,7 +84,6 @@ class ButtonsManager {
     }
   
     hideButtons() {
-      // Skrytie tlačidiel
       if (this._rotateButton) {
         this._rotateButton.style.display = 'none';
       }
@@ -96,9 +94,9 @@ class ButtonsManager {
     }
   
     hideButtonsAndReset() {
-      this.hideButtons(); // Skrytie tlačidiel
+      this.hideButtons();
       if (this.gameFlowContext.currentCard) {
-        this.gameFlowContext.currentCard.position.y = 0; // Položenie karty na konečnú pozíciu
+        //this.gameFlowContext.currentCard.position.y = 0.16;
         this.gameFlowContext.currentCard = null;
       }
     }
@@ -149,4 +147,4 @@ class ButtonsManager {
   
   }
 
-export default ButtonsManager; // Export triedy
+export default ButtonsManager;

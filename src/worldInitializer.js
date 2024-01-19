@@ -22,25 +22,24 @@ class WorldInitializer {
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
       
-        // Pridanie počúvača udalostí pre zmenu veľkosti okna
+        // resize listener
         window.addEventListener('resize', () => {
           this._OnWindowResize();
         }, false);
       
-        // Spustenie vykresľovacej slučky
         this._RAF();
       
         return renderer;
       }
   
-    _initializeCamera() {
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
-      camera.position.set(0, 10, 5);
-      camera.lookAt(new THREE.Vector3(0, 0, 0));
-
-      return camera;
-    }
+      _initializeCamera() {
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      
+        camera.position.set(0, 3.9, 2);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+      
+        return camera;
+      }
   
     _addLightToScene(scene) {
       const light = new THREE.DirectionalLight(0xFFFFFF, 1.0);
@@ -91,7 +90,7 @@ class WorldInitializer {
       const loader = new GLTFLoader();
       loader.load('../models3d/table.glb', (gltf) => {
 
-        gltf.scene.position.set(5, -0.12, 5);
+        //gltf.scene.position.set(5, -0.12, 5);
         this._scene.add(gltf.scene);
       });
     }

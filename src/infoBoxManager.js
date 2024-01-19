@@ -17,24 +17,27 @@ export class InfoBoxManager {
     updateGameInfo(players, currentPlayerId, currentSquare, totalCardsPlaced, totalRedCardsPlaced) {
       let infoText = '';
   
-      // Informácie o hráčoch
+      // Player info
       players.forEach(player => {
         infoText += `Player ${player.userData.id}: ${player.userData.dimensionI}, ${player.userData.dimensionJ}, Moves: ${player.userData.moves}<br>`;
       });
   
-      // Informácie o tom, ktorý hráč je na rade
-      infoText += `Hráč na rade: ${currentPlayerId}<br>`;
+      // Who is on turn
+      infoText += `On turn: ${currentPlayerId}<br>`;
   
-      // Informácie o karte
+      /*
+      // Card info
       if (currentSquare) {
         for (const [key, value] of Object.entries(currentSquare.userData)) {
           infoText += `${key}: ${value}<br>`;
         }
       }
   
-      // Informácie o počte položených kariet
-      infoText += `Počet kariet: ${totalCardsPlaced}<br>`;
-      infoText += `Počet červených kariet: ${totalRedCardsPlaced}`;
+      */
+
+      // Card count info
+      infoText += `Card count: ${totalCardsPlaced}<br>`;
+      infoText += `Red card count: ${totalRedCardsPlaced}`;
   
       this._infoBox.innerHTML = infoText;
     }

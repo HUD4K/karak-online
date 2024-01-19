@@ -12,8 +12,6 @@ body {
   cursor: url('res/daggercursor.png'), auto;
 }
 
-
-
 canvas {
   display: block;
 }
