@@ -10,6 +10,7 @@ import { characterProperties } from './characterProperties.js';
 import { TilesFunctions } from './TilesFunctions.js';
 
 console.log("      -_- ZAVRI DEV TOOLS CHUJU, EŠTE NEMÁM SSR -_- ");
+console.log("       Serus Jožko");
 
 class KarakGameFlow {
   constructor() {
