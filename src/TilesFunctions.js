@@ -4,8 +4,8 @@ import { cardProperties } from './cardProperties.js';
 
 
 export class TilesFunctions {
-    constructor(state) {
-        this.state = state;
+    constructor(gameContext) {
+        this.gameContext = gameContext;
     }
 
     _createGrid() {
@@ -27,11 +27,20 @@ export class TilesFunctions {
                   dimensionI: i,
                   dimensionJ: j,
                   isCard: false,
+                  headingWest: false,
+                  headingNorth: false,
+                  headingEast: false,
+                  headingSouth: false,
+                  isRoom: false,
+                  isArena: false,
+                  isChamber: false,
+                  isTeleport: false,
+                  isHealingWell: false,
                   monsterId: 0,
                   itemId: 0,
               };
 
-              this.state.scene.add(square);
+              this.gameContext.scene.add(square);
           }
       }
     }
@@ -50,7 +59,7 @@ export class TilesFunctions {
 
 
     _AddInitialCard() {
-        const card = this.state.cardModel.clone();
+        const card = this.gameContext.cardModel.clone();
     
         const textureLoader = new THREE.TextureLoader();
         card.traverse((child) => {
@@ -63,12 +72,12 @@ export class TilesFunctions {
         const initX = 0;
         const initZ = 0;
         card.position.set(initX, 0.16, initZ);
-        this.state.scene.add(card);
+        this.gameContext.scene.add(card);
         
-        this.state.infoBoxManager.updateGameInfo(this.state.players, this.state.currentPlayerId, this.state.currentSquare, this.state.totalCardsPlaced, this.state.totalRedCardsPlaced);
+        this.gameContext.infoBoxManager.updateGameInfo(this.gameContext.players, this.gameContext.currentPlayerId, this.gameContext.currentSquare, this.gameContext.totalCardsPlaced, this.gameContext.totalRedCardsPlaced);
     
         // setting up the initial card cell
-        const initialSquare = this.state.scene.children.find(obj => obj.userData && obj.userData.dimensionI === initX && obj.userData.dimensionJ === initZ);
+        const initialSquare = this.gameContext.scene.children.find(obj => obj.userData && obj.userData.dimensionI === initX && obj.userData.dimensionJ === initZ);
         if (initialSquare) {
         initialSquare.userData.isCard = true;
         initialSquare.userData.headingWest = true;
@@ -120,7 +129,7 @@ export class TilesFunctions {
       
       const textureProperties = cardProperties[this.selectedTexture].properties;
       if (textureProperties.isChamber || textureProperties.isArena) {
-        this.state.totalRedCardsPlaced++;
+        this.gameContext.totalRedCardsPlaced++;
       }
 
       return selectedTexture;

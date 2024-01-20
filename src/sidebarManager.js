@@ -46,10 +46,12 @@ export class SidebarManager {
       // Text 1 and Text 2
       const textElement1 = document.createElement('div');
       textElement1.textContent = playerName;
+      textElement1.style.color = 'gold';
       leftPanel.appendChild(textElement1);
   
       const textElement2 = document.createElement('div');
       textElement2.textContent = characterName;
+      textElement2.style.color = 'gold';
       leftPanel.appendChild(textElement2);
   
       // Avatar
@@ -84,6 +86,7 @@ export class SidebarManager {
         square.style.display = 'flex';
         square.style.alignItems = 'center';
         square.style.justifyContent = 'center';
+        square.style.color = 'gold';
         square.textContent = name;
         square.id = `square-${index}`; // ID for each square
         rightPanel.appendChild(square);
@@ -118,7 +121,7 @@ export class SidebarManager {
       characters.forEach(character => {
           this.createCharacterCard(character.playerName, character.characterName);
       });
-  }
+    }
 
     // Method for updating the content of the sidebar, if needed
     updateSidebarContent(content) {

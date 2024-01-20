@@ -1,20 +1,6 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/loaders/GLTFLoader.js';
-import WorldInitializer from './worldInitializer.js';
-import { InfoBoxManager } from './infoBoxManager.js';
-import { cardProperties } from './cardProperties.js';
-import { SidebarManager } from './sidebarManager.js';
-import ButtonsManager from './ButtonsManager.js';
-import StartScreen from './StartScreen.js';
-import { characterProperties } from './characterProperties.js';
-import { TilesFunctions } from './TilesFunctions.js';
-
-console.log("      -_- ZAVRI DEV TOOLS CHUJU, EŠTE NEMÁM SSR -_- ");
 
 class KarakGameFlow {
   constructor() {
-    
-
     const startScreen = new StartScreen(playerNames => {
       this.initializeCharacters(playerNames);
 
@@ -22,20 +8,12 @@ class KarakGameFlow {
       window.addEventListener('click', (event) => this._onMouseClick(event), false);
     });
 
-    this._worldInitializer = new WorldInitializer();
-    const { renderer, camera, scene, controls } = this._worldInitializer.getWorldComponents();
-
     // initialized world components
     this._threejs = renderer;
-    this._camera = camera;
     this._controls = controls;
     this._raycaster = this._worldInitializer.getRaycaster();
     this._mouse = this._worldInitializer.getMouseVector();
 
-    this.totalCardsPlaced = 0,
-    this.totalRedCardsPlaced = 0,
-    this.isCardBeingPlaced = false,
-    this.isRotating = false,
     this.currentPlayerId = 1,
     this.players = [],
     this.cardModel = null, // !
@@ -298,6 +276,8 @@ class KarakGameFlow {
       if (intersectedObject.userData.dimensionI !== undefined) {
         // Get current player and current player square
         const currentPlayer = this._findPlayerById(this.currentPlayerId);
+
+        //console.log(currentPlayer.userData.name);
 
         const currentPlayerSquare = this.scene.children.find(obj => obj.userData && obj.userData.dimensionI === currentPlayer.userData.dimensionI && obj.userData.dimensionJ === currentPlayer.userData.dimensionJ);
     

@@ -1,11 +1,9 @@
 
 class ButtonsManager {
-    constructor(gameFlowContext, state) {
+    constructor(gameFlowContext) {
       this.gameFlowContext = gameFlowContext; // Save reference to main class of game
       this._rotateButton = null;
       this._okButton = null;
-
-      this.state = state;
   
       this.initializeButtons();
     }
@@ -90,7 +88,7 @@ class ButtonsManager {
       if (this._okButton) {
         this._okButton.style.display = 'none';
       }
-      this.state.isCardBeingPlaced = false;
+      this.gameFlowContext.isCardBeingPlaced = false;
     }
   
     hideButtonsAndReset() {

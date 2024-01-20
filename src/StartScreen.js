@@ -66,7 +66,9 @@ class StartScreen {
         document.body.appendChild(this.startScreenDiv);
     
         // Event for start button
-        this.startButton.addEventListener('click', () => {
+        this.startButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // disable to expand the event
+        
             const playerNames = this.playerNameInputs.map(input => input.value.trim()).filter(name => name.length > 0);
             this.playerNames = playerNames; // Save names to class property
             this.hideStartScreen();
