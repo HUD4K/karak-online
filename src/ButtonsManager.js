@@ -62,7 +62,7 @@ class ButtonsManager {
     setupButtonEventListeners() {
       this._rotateButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        this.gameFlowContext._rotateCurrentCard();
+        this.gameFlowContext.tilesFunctions._rotateCurrentCard();
       });
   
       this._okButton.addEventListener('click', (event) => {

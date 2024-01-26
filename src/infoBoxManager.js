@@ -25,7 +25,7 @@ export class InfoBoxManager {
       // Who is on turn
       infoText += `On turn: ${currentPlayerId}<br>`;
   
-      /*
+      
       // Card info
       if (currentSquare) {
         for (const [key, value] of Object.entries(currentSquare.userData)) {
@@ -33,7 +33,7 @@ export class InfoBoxManager {
         }
       }
   
-      */
+      
 
       // Card count info
       infoText += `Card count: ${totalCardsPlaced}<br>`;

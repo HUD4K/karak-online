@@ -1,6 +1,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
 import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/loaders/GLTFLoader.js';
 import { cardProperties } from './cardProperties.js';
+import { WorldInfluencer } from './WorldInfluencer.js';
 
 
 export class TilesFunctions {
@@ -133,5 +134,143 @@ export class TilesFunctions {
       }
 
       return selectedTexture;
+    }
+
+
+    async _addNewCard(intersectedObject) {
+      this.gameContext.isCardBeingPlaced = true;
+    
+      if (!this.gameContext.cardModel) {
+        console.error('Card model has not been loaded yet.');
+        return;
+      }
+    
+      const card = this.gameContext.cardModel.clone();
+    
+      const selectedTexture = this._selectRandomTexture();
+      if (!selectedTexture) {
+        console.error('No more textures available');
+        return;
+      }
+    
+      const textureLoader = new THREE.TextureLoader();
+      const cardTexture = textureLoader.load(`../textures/tiles/${selectedTexture}.jpg`);
+    
+      card.traverse((child) => {
+        if (child.isMesh && child.material.name === 'topSurface') {
+          // New material for each clone
+          const newMaterial = new THREE.MeshStandardMaterial({
+            map: cardTexture
+          });
+          child.material = newMaterial;
+        }
+      });
+    
+      card.position.set(intersectedObject.position.x, 10, intersectedObject.position.z);
+      this.gameContext.scene.add(card);
+    
+      await this._animateCardToPosition(card, 1, 600);
+    
+      this._setCardDirections(intersectedObject, selectedTexture);
+      this.gameContext.buttonsManager.showButtons(this.gameContext._lastMouseX, this.gameContext._lastMouseY);
+    
+      WorldInfluencer.shakeScreen(200);
+    
+      // Not elegant, but works for now
+      this.gameContext.buttonsManager.setOkButtonOnClick(() => {
+        setTimeout(() => WorldInfluencer.shakeScreen(350), 170);
+        this._animateCardToPosition(card, 0.15, 100);
+        setTimeout(() => this.gameContext._MovePlayerToPosition(this.gameContext.currentPlayerId, intersectedObject.userData.dimensionI, intersectedObject.userData.dimensionJ), 50);
+        this.gameContext.buttonsManager.clearOkButtonOnClick(); // remove listener
+      });
+    
+      intersectedObject.userData.isCard = true;
+      this.gameContext.totalCardsPlaced++;
+      this.gameContext.currentCard = card;
+  
+      this._checkCardCompatibility();
+    }
+
+    _setCardDirections(square, textureName) {
+      const properties = cardProperties[textureName].properties;
+      for (const prop in properties) {
+        square.userData[prop] = properties[prop];
+      }
+    }
+
+
+    //ROTATING CARD:
+    //moved here from karakgameflow
+
+    _rotateCurrentCard(duration = 300) {
+      if (this.gameContext.currentCard && !this.gameContext.isRotating) {
+        this.gameContext.isRotating = true;
+  
+        this.gameContext.buttonsManager.disableOkButton();
+        this.gameContext.buttonsManager.disableRotateButton();
+  
+        const startRotation = this.gameContext.currentCard.rotation.y;
+        const endRotation = startRotation + Math.PI / 2;
+        const startTime = performance.now();
+
+        const animateRotation = () => {
+            const currentTime = performance.now();
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+
+            this.gameContext.currentCard.rotation.y = startRotation + (endRotation - startRotation) * progress;
+
+            if (progress < 1) {
+              requestAnimationFrame(animateRotation);
+            } else {
+              this.gameContext.isRotating = false;
+              this._updateCardDirections(this.gameContext.currentSquare); 
+              this._checkCardCompatibility();
+              this.gameContext.buttonsManager.enableRotateButton();
+            }
+        };
+
+        animateRotation();
+      }
+    }
+
+    _checkCardCompatibility() {
+      const currentPlayer = this.gameContext._findPlayerById(this.gameContext.currentPlayerId);
+      const currentPlayerSquare = this.gameContext.scene.children.find(obj => obj.userData && obj.userData.dimensionI === currentPlayer.userData.dimensionI && obj.userData.dimensionJ === currentPlayer.userData.dimensionJ);
+    
+      const newCardSquare = this.gameContext.currentSquare;
+  
+      let isCompatible = false;
+  
+      const deltaI = newCardSquare.userData.dimensionI - currentPlayerSquare.userData.dimensionI;
+      const deltaJ = newCardSquare.userData.dimensionJ - currentPlayerSquare.userData.dimensionJ;    
+    
+      if (deltaI === 1 && currentPlayerSquare.userData.headingEast && newCardSquare.userData.headingWest) {
+        isCompatible = true;
+      } else if (deltaI === -1 && currentPlayerSquare.userData.headingWest && newCardSquare.userData.headingEast) {
+        isCompatible = true;
+      } else if (deltaJ === 1 && currentPlayerSquare.userData.headingSouth && newCardSquare.userData.headingNorth) {
+        isCompatible = true;
+      } else if (deltaJ === -1 && currentPlayerSquare.userData.headingNorth && newCardSquare.userData.headingSouth) {
+        isCompatible = true;
+      }
+  
+      if (isCompatible) {
+        this.gameContext.buttonsManager.enableOkButton();
+      }
+      else {
+        this.gameContext.buttonsManager.disableOkButton();
+      }
+    }
+
+    
+    _updateCardDirections(square) {
+      // temporary variable
+      const originalNorth = square.userData.headingNorth;
+    
+      // update directions after rotation
+      square.userData.headingNorth = square.userData.headingEast;
+      square.userData.headingEast = square.userData.headingSouth;
+      square.userData.headingSouth = square.userData.headingWest;
+      square.userData.headingWest = originalNorth;
     }
 }

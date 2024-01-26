@@ -9,9 +9,6 @@ import StartScreen from './StartScreen.js';
 import { characterProperties } from './characterProperties.js';
 import { TilesFunctions } from './TilesFunctions.js';
 
-console.log("      -_- ZAVRI DEV TOOLS CHUJU, EŠTE NEMÁM SSR -_- ");
-console.log("       Serus Jožko");
-
 class KarakGameFlow {
   constructor() {
     
@@ -45,7 +42,6 @@ class KarakGameFlow {
     this.scene = scene
 
     this.buttonsManager = new ButtonsManager(this)
-
 
     this.tilesFunctions = new TilesFunctions(this);
 
@@ -222,67 +218,6 @@ class KarakGameFlow {
     }
 }
 
-  _setCardDirections(square, textureName) {
-    const properties = cardProperties[textureName].properties;
-    for (const prop in properties) {
-      square.userData[prop] = properties[prop];
-    }
-  }
-
-  async _addNewCard(intersectedObject) {
-    this.isCardBeingPlaced = true;
-  
-    if (!this.cardModel) {
-      console.error('Card model has not been loaded yet.');
-      return;
-    }
-  
-    const card = this.cardModel.clone();
-  
-    const selectedTexture = this.tilesFunctions._selectRandomTexture();
-    if (!selectedTexture) {
-      console.error('No more textures available');
-      return;
-    }
-  
-    const textureLoader = new THREE.TextureLoader();
-    const cardTexture = textureLoader.load(`../textures/tiles/${selectedTexture}.jpg`);
-  
-    card.traverse((child) => {
-      if (child.isMesh && child.material.name === 'topSurface') {
-        // New material for each clone
-        const newMaterial = new THREE.MeshStandardMaterial({
-          map: cardTexture
-        });
-        child.material = newMaterial;
-      }
-    });
-  
-    card.position.set(intersectedObject.position.x, 10, intersectedObject.position.z);
-    this.scene.add(card);
-  
-    await this.tilesFunctions._animateCardToPosition(card, 1, 600);
-  
-    this._setCardDirections(intersectedObject, selectedTexture);
-    this.buttonsManager.showButtons(this._lastMouseX, this._lastMouseY);
-  
-    this._shakeScreen(200);
-  
-    // Not elegant, but works for now
-    this.buttonsManager.setOkButtonOnClick(() => {
-      setTimeout(() => this._shakeScreen(350), 170);
-      this.tilesFunctions._animateCardToPosition(card, 0.15, 100);
-      setTimeout(() => this._MovePlayerToPosition(this.currentPlayerId, intersectedObject.userData.dimensionI, intersectedObject.userData.dimensionJ), 50);
-      this.buttonsManager.clearOkButtonOnClick(); // remove listener
-    });
-  
-    intersectedObject.userData.isCard = true;
-    this.totalCardsPlaced++;
-    this.currentCard = card;
-
-    this._checkCardCompatibility();
-  }
-  
 
   _onMouseClick(event) {
     if (this.isCardBeingPlaced) {
@@ -321,7 +256,7 @@ class KarakGameFlow {
           this.infoBoxManager.updateGameInfo(this.players, this.currentPlayerId, this.currentSquare, this.totalCardsPlaced, this.totalRedCardsPlaced);
     
           if (!intersectedObject.userData.isCard) {
-            this._addNewCard(intersectedObject);
+            this.tilesFunctions._addNewCard(intersectedObject);
           } else {
             this._MovePlayerToPosition(this.currentPlayerId, intersectedObject.userData.dimensionI, intersectedObject.userData.dimensionJ);
           }
@@ -329,106 +264,6 @@ class KarakGameFlow {
       }
     }    
   }
-
-
-  
-  _shakeScreen(duration) {
-    const body = document.body;
-    body.style.overflow = 'hidden'; // disable scrolling
-    const startTime = Date.now();
-  
-    const shake = () => {
-      const elapsedTime = Date.now() - startTime;
-      const relativeTime = elapsedTime / duration;
-  
-      if (relativeTime < 1) {
-        const x = (Math.random() - 0.5) * 12;
-        const y = (Math.random() - 0.5) * 12;
-        body.style.transform = `translate(${x}px, ${y}px)`;
-  
-        requestAnimationFrame(shake);
-      } else {
-        body.style.transform = 'translate(0px, 0px)';
-      }
-    };
-  
-    shake();
-  }
-  
-
-  _updateCardDirections(square) {
-    // temporary variable
-    const originalNorth = square.userData.headingNorth;
-  
-    // update directions after rotation
-    square.userData.headingNorth = square.userData.headingEast;
-    square.userData.headingEast = square.userData.headingSouth;
-    square.userData.headingSouth = square.userData.headingWest;
-    square.userData.headingWest = originalNorth;
-  }
-
-
-  _rotateCurrentCard(duration = 300) {
-    if (this.currentCard && !this.isRotating) {
-        this.isRotating = true;
-
-        this.buttonsManager.disableOkButton();
-        this.buttonsManager.disableRotateButton();
-
-        const startRotation = this.currentCard.rotation.y;
-        const endRotation = startRotation + Math.PI / 2;
-        const startTime = performance.now();
-
-        const animateRotation = () => {
-            const currentTime = performance.now();
-            const progress = Math.min((currentTime - startTime) / duration, 1);
-
-            this.currentCard.rotation.y = startRotation + (endRotation - startRotation) * progress;
-
-            if (progress < 1) {
-                requestAnimationFrame(animateRotation);
-            } else {
-                this.isRotating = false;
-                this._updateCardDirections(this.currentSquare); 
-                this._checkCardCompatibility();
-                this.buttonsManager.enableRotateButton();
-            }
-        };
-
-        animateRotation();
-    }
-}
-
-
-  _checkCardCompatibility() {
-    const currentPlayer = this._findPlayerById(this.currentPlayerId);
-    const currentPlayerSquare = this.scene.children.find(obj => obj.userData && obj.userData.dimensionI === currentPlayer.userData.dimensionI && obj.userData.dimensionJ === currentPlayer.userData.dimensionJ);
-  
-    const newCardSquare = this.currentSquare;
-
-    let isCompatible = false;
-
-    const deltaI = newCardSquare.userData.dimensionI - currentPlayerSquare.userData.dimensionI;
-    const deltaJ = newCardSquare.userData.dimensionJ - currentPlayerSquare.userData.dimensionJ;    
-  
-    if (deltaI === 1 && currentPlayerSquare.userData.headingEast && newCardSquare.userData.headingWest) {
-      isCompatible = true;
-    } else if (deltaI === -1 && currentPlayerSquare.userData.headingWest && newCardSquare.userData.headingEast) {
-      isCompatible = true;
-    } else if (deltaJ === 1 && currentPlayerSquare.userData.headingSouth && newCardSquare.userData.headingNorth) {
-      isCompatible = true;
-    } else if (deltaJ === -1 && currentPlayerSquare.userData.headingNorth && newCardSquare.userData.headingSouth) {
-      isCompatible = true;
-    }
-
-    if (isCompatible) {
-      this.buttonsManager.enableOkButton();
-    }
-    else {
-      this.buttonsManager.disableOkButton();
-    }
-  }
-
 }
 
 export default KarakGameFlow;
