@@ -110,12 +110,14 @@ class KarakGameFlow {
     player.position.set(worldX, 0.15, worldZ);
 
     player.userData = {
+        id: id,
+        characterName: characterName,
+        moves: 4,
+        lives: 5,
         dimensionI: defaultCoord,
         dimensionJ: defaultCoord,
-        id: id,
         offsetX: offset.x,
         offsetY: offset.y,
-        moves: 4
     };
 
     this.scene.add(player);
