@@ -118,6 +118,14 @@ class KarakGameFlow {
         dimensionJ: defaultCoord,
         offsetX: offset.x,
         offsetY: offset.y,
+
+        //inventory:
+        weapon1: null,
+        weapon2: null,
+        spell1: null,
+        spell2: null,
+        tpell3: null,
+        key: false,
     };
 
     this.scene.add(player);

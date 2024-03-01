@@ -77,7 +77,7 @@ export class SidebarManager {
       contentContainer.appendChild(rightPanel);
   
       // Creating 6 squares
-      const squareNames = ['W1', 'W2', 'S1', 'S2', 'K', 'T'];
+      const squareNames = ['W1', 'W2', 'S1', 'S2', 'S3', 'K'];
       squareNames.forEach((name, index) => {
         const square = document.createElement('div');
         square.style.width = '50px';
