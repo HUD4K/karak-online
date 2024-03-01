@@ -38,7 +38,7 @@ class KarakGameFlow {
     this.players = [],
     this.cardModel = null, // !
     this.infoBoxManager = new InfoBoxManager(),
-    this.sidebarManager = new SidebarManager(),
+    this.sidebarManager = new SidebarManager(this),
     this.scene = scene
 
     this.buttonsManager = new ButtonsManager(this)

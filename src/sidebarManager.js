@@ -1,9 +1,10 @@
 import { characterProperties } from './characterProperties.js';
 
 export class SidebarManager {
-    constructor() {
-      this._sidebar = this._createSidebar();
-    }
+  constructor(gameContext) {
+    this.gameContext = gameContext; // Uloženie referencie na KarakGameFlow
+    this._sidebar = this._createSidebar();
+  }
   
     _createSidebar() {
       const sidebar = document.createElement('div');
@@ -17,11 +18,12 @@ export class SidebarManager {
       return sidebar;
     }
 
-    createCharacterCard(playerName, characterName) {
+    createCharacterCard(playerName, characterName, playerId) {
       const character = characterProperties[characterName];
       const imagePath = character.avatarImage;
 
       const container = document.createElement('div');
+      container.classList.add('player-card');
       container.style.display = 'flex';
       container.style.flexDirection = 'column';
       container.style.width = '100%';
@@ -77,19 +79,28 @@ export class SidebarManager {
       contentContainer.appendChild(rightPanel);
   
       // Creating 6 squares
-      const squareNames = ['W1', 'W2', 'S1', 'S2', 'S3', 'K'];
-      squareNames.forEach((name, index) => {
-        const square = document.createElement('div');
-        square.style.width = '50px';
-        square.style.height = '50px';
-        square.style.backgroundColor = 'green';
-        square.style.display = 'flex';
-        square.style.alignItems = 'center';
-        square.style.justifyContent = 'center';
-        square.style.color = 'gold';
-        square.textContent = name;
-        square.id = `square-${index}`; // ID for each square
-        rightPanel.appendChild(square);
+      const inventoryItems = ['W1', 'W2', 'S1', 'S2', 'S3', 'K']; // Identifikátory pre inventárne sloty
+      inventoryItems.forEach((item) => {
+        const itemElement = document.createElement('div');
+        itemElement.textContent = item;
+        itemElement.addEventListener('click', () => {
+            // Priamy prístup k aktuálnym dátam hráča cez gameContext
+            const player = this.gameContext.players.find(p => p.userData.id === playerId);
+            if (player) {
+                console.log(`Klikol si na "${item}" hráča s id ${playerId} a menom ${player.userData.playerName}, s postavou ${player.userData.characterName}, ktorý má počet životov: ${player.userData.lives} a počet pohybov: ${player.userData.moves}.`);
+            } else {
+                console.log("Hráč nenájdený."); // Pre prípad, že by sa hráč nenašiel
+            }
+        });
+        itemElement.style.width = '50px';
+        itemElement.style.height = '50px';
+        itemElement.style.backgroundColor = 'green';
+        itemElement.style.display = 'flex';
+        itemElement.style.alignItems = 'center';
+        itemElement.style.justifyContent = 'center';
+        itemElement.style.color = 'gold';
+        itemElement.textContent = item;
+        rightPanel.appendChild(itemElement);
       });
 
       const healthCircleContainer = document.createElement('div');
@@ -118,10 +129,11 @@ export class SidebarManager {
     }
 
     createMultipleCharacterCards(characters) {
-      characters.forEach(character => {
-          this.createCharacterCard(character.playerName, character.characterName);
+      characters.forEach((character, index) => {
+          // Predpokladáme, že index + 1 je ID hráča
+          this.createCharacterCard(character.playerName, character.characterName, index + 1);
       });
-    }
+  }
 
     // Method for updating the content of the sidebar, if needed
     updateSidebarContent(content) {
