@@ -32,6 +32,7 @@ export class TilesFunctions {
                   headingNorth: false,
                   headingEast: false,
                   headingSouth: false,
+
                   isRoom: false,
                   isArena: false,
                   isChamber: false,
@@ -57,6 +58,18 @@ export class TilesFunctions {
           });
         });
       }
+
+    async _LoadMonsterObjectOnce() {
+      return new Promise((resolve, reject) => {
+        const loader = new GLTFLoader();
+        loader.load('../models3d/monsterObject.glb', gltf => {
+          resolve(gltf.scene);
+        }, undefined, error => {
+          console.error('An error happened while loading the model:', error);
+          reject(error);
+        });
+      });
+    }
 
 
     _AddInitialCard() {
@@ -92,6 +105,7 @@ export class TilesFunctions {
     _animateCardToPosition(card, targetY, duration) {
       return new Promise((resolve) => {
         const startY = card.position.y;
+        console.log('POCIATOCNA POZICIA JE: ' + startY);
         const endY = targetY;
     
         const startTime = performance.now();
@@ -180,6 +194,12 @@ export class TilesFunctions {
       this.gameContext.buttonsManager.setOkButtonOnClick(() => {
         setTimeout(() => WorldInfluencer.shakeScreen(350), 170);
         this._animateCardToPosition(card, 0.15, 100);
+
+        // NEW MONSTER OBJECT
+        if (intersectedObject.userData.isRoom) {
+          this._setMonsterObject(intersectedObject);
+        }
+
         setTimeout(() => this.gameContext._MovePlayerToPosition(this.gameContext.currentPlayerId, intersectedObject.userData.dimensionI, intersectedObject.userData.dimensionJ), 50);
         this.gameContext.buttonsManager.clearOkButtonOnClick(); // remove listener
       });
@@ -188,8 +208,16 @@ export class TilesFunctions {
       this.gameContext.totalCardsPlaced++;
       this.gameContext.currentCard = card;
   
-      this._checkCardCompatibility();
+      this._checkCardCompatibility(intersectedObject);
     }
+
+    _setMonsterObject(intersectedObject) {
+      const monsterObject = this.gameContext.monsterObject.clone();
+      monsterObject.position.set(intersectedObject.position.x - 0.2, -1, intersectedObject.position.z);
+      this.gameContext.scene.add(monsterObject);
+      this._animateCardToPosition(monsterObject, 0.4, 800);
+    }
+
 
     _setCardDirections(square, textureName) {
       const properties = cardProperties[textureName].properties;

@@ -37,6 +37,7 @@ class KarakGameFlow {
     this.currentPlayerId = 1,
     this.players = [],
     this.cardModel = null, // !
+    this.monsterObject = null,
     this.infoBoxManager = new InfoBoxManager(),
     this.sidebarManager = new SidebarManager(this),
     this.scene = scene
@@ -49,6 +50,11 @@ class KarakGameFlow {
       // save model and update state
       this.cardModel = model;
       this.tilesFunctions._AddInitialCard();  
+    });
+
+    this.tilesFunctions._LoadMonsterObjectOnce().then(model => {
+      // save model and update state
+      this.monsterObject = model;
     });
     
     
@@ -281,5 +287,3 @@ export default KarakGameFlow;
 window.addEventListener('DOMContentLoaded', () => {
   const _APP = new KarakGameFlow(); // create instance
 });
-
-
